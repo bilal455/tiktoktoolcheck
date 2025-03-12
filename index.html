@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video Downloader</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; cursor: pointer; }
+        .result { margin-top: 20px; }
+        img { max-width: 200px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>TikTok Video Downloader</h1>
+    <input type="text" id="tiktokUrl" placeholder="Enter TikTok Video URL">
+    <button onclick="downloadTikTok()">Download</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        async function downloadTikTok() {
+            const url = document.getElementById("tiktokUrl").value;
+            if (!url) return alert("Please enter a valid TikTok URL");
+
+            const apiUrl = "https://tiktoktesting-production.up.railway.app/download?url=" + encodeURIComponent(url);
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById("result").innerHTML = "<p>Error: " + data.error + "</p>";
+                    return;
+                }
+
+                document.getElementById("result").innerHTML = `
+                    <p><b>Video:</b> <button onclick="forceDownload('${data.video_url}', 'tiktok-video.mp4')">Download Video</button></p>
+                    <p><b>Audio:</b> <button onclick="forceDownload('${data.audio_url}', 'tiktok-audio.mp3')">Download Audio</button></p>
+                    <p><b>Thumbnail:</b> <br><img src="${data.thumbnail}" alt="Thumbnail"></p>
+                    <p><b>Script:</b> ${data.script}</p>
+                `;
+
+            } catch (error) {
+                document.getElementById("result").innerHTML = "<p>Error fetching video.</p>";
+            }
+        }
+
+        async function forceDownload(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                alert("Download failed: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
 
