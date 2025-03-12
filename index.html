@@ -3,26 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader</title>
+    <title>TikTok Video Downloader</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        input { width: 80%; padding: 10px; margin: 10px 0; }
-        button { padding: 10px; cursor: pointer; }
-        .result { margin-top: 20px; }
-        img { max-width: 200px; margin-top: 10px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background: #f4f4f4; 
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 12px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: left;
+        }
+        .download-links a {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .download-links a:hover {
+            background: #0056b3;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>TikTok Video Downloader</h1>
-    <input type="text" id="tiktokUrl" placeholder="Enter TikTok Video URL">
-    <button onclick="downloadTikTok()">Download</button>
 
-    <div class="result" id="result"></div>
+    <div class="container">
+        <h1>🎵 TikTok Video Downloader</h1>
+        <input type="text" id="tiktokUrl" placeholder="Enter TikTok Video URL">
+        <button onclick="downloadTikTok()">Download</button>
+        <div class="result" id="result"></div>
+    </div>
 
     <script>
         async function downloadTikTok() {
             const url = document.getElementById("tiktokUrl").value;
-            if (!url) return alert("Please enter a valid TikTok URL");
+            if (!url) {
+                alert("⚠️ Please enter a valid TikTok URL!");
+                return;
+            }
 
             const apiUrl = "https://tiktoktesting-production.up.railway.app/download?url=" + encodeURIComponent(url);
 
@@ -31,20 +86,24 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    document.getElementById("result").innerHTML = "<p>Error: " + data.error + "</p>";
+                    document.getElementById("result").innerHTML = `<p style="color:red;"><b>Error:</b> ${data.error}</p>`;
                     return;
                 }
 
                 document.getElementById("result").innerHTML = `
-                    <p><b>Video:</b> <a href="${data.video_url}" target="_blank" download>Download Video</a></p>
-                    <p><b>Audio:</b> <a href="${data.audio_url}" target="_blank" download>Download Audio</a></p>
-                    <p><b>Thumbnail:</b> <br><img src="${data.thumbnail}" alt="Thumbnail"></p>
-                    <p><b>Script:</b> ${data.script}</p>
+                    <div class="download-links">
+                        <a href="${data.video_url}" download="TikTok-Video.mp4">⬇️ Download Video</a>
+                        <a href="${data.audio_url}" download="TikTok-Audio.mp3">🎵 Download Audio</a>
+                    </div>
+                    <p><b>Thumbnail:</b></p>
+                    <img src="${data.thumbnail}" alt="Thumbnail">
+                    <p><b>Script:</b> ${data.script || "No script available"}</p>
                 `;
             } catch (error) {
-                document.getElementById("result").innerHTML = "<p>Error fetching video.</p>";
+                document.getElementById("result").innerHTML = `<p style="color:red;">❌ Error fetching video.</p>`;
             }
         }
     </script>
+
 </body>
 </html>
