@@ -51,6 +51,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            cursor: pointer;
         }
         .download-links a:hover {
             background: #0056b3;
@@ -92,8 +93,8 @@
 
                 document.getElementById("result").innerHTML = `
                     <div class="download-links">
-                        <a href="${data.video_url}" download="TikTok-Video.mp4">⬇️ Download Video</a>
-                        <a href="${data.audio_url}" download="TikTok-Audio.mp3">🎵 Download Audio</a>
+                        <a href="#" onclick="forceDownload('${data.video_url}', 'TikTok-Video.mp4')">⬇️ Download Video</a>
+                        <a href="#" onclick="forceDownload('${data.audio_url}', 'TikTok-Audio.mp3')">🎵 Download Audio</a>
                     </div>
                     <p><b>Thumbnail:</b></p>
                     <img src="${data.thumbnail}" alt="Thumbnail">
@@ -102,6 +103,20 @@
             } catch (error) {
                 document.getElementById("result").innerHTML = `<p style="color:red;">❌ Error fetching video.</p>`;
             }
+        }
+
+        function forceDownload(url, filename) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                })
+                .catch(() => alert('❌ Failed to download file'));
         }
     </script>
 
