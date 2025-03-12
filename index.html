@@ -3,51 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader</title>
+    <title>TikTok Video Downloader</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 20px; 
-            background-color: #f9f9f9;
-        }
-        input { 
-            width: 80%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .btn {
-            display: block;
-            width: 80%;
-            padding: 15px;
-            margin: 10px auto;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            text-align: center;
-        }
-        .btn-primary { background-color: #007bff; }
-        .btn-primary:hover { background-color: #0056b3; }
-        .btn-secondary { background-color: #28a745; }
-        .btn-secondary:hover { background-color: #1e7e34; }
-        .btn-dark { background-color: #000; }
-        .btn-dark:hover { background-color: #333; }
-        .btn-blue { background-color: #007bff; }
-        .btn-blue:hover { background-color: #0056b3; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; cursor: pointer; }
         .result { margin-top: 20px; }
-        img { max-width: 200px; margin-top: 10px; border-radius: 5px; }
+        img { max-width: 200px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>TikTok Video Downloader</h1>
     <input type="text" id="tiktokUrl" placeholder="Enter TikTok Video URL">
-    <button class="btn btn-primary" onclick="downloadTikTok()">Download</button>
+    <button onclick="downloadTikTok()">Download</button>
 
     <div class="result" id="result"></div>
 
@@ -68,15 +36,33 @@
                 }
 
                 document.getElementById("result").innerHTML = `
-                    <a href="${data.video_url}" class="btn btn-primary" download>⬇ Download</a>
-                    <a href="${data.video_hd_url}" class="btn btn-blue" download>⬇ Download HD</a>
-                    <a href="${data.profile_url}" class="btn btn-secondary" download>Download TikTok Profile</a>
-                    <a href="#" class="btn btn-dark" onclick="window.location.reload()">Download other video</a>
-                    <p><b>Thumbnail:</b><br> <img src="${data.thumbnail}" alt="Thumbnail"></p>
-                    <p><b>Script:</b> ${data.script || 'No script available'}</p>
+                    <p><b>Video:</b> <button onclick="forceDownload('${data.video_url}', 'tiktok-video.mp4')">Download Video</button></p>
+                    <p><b>Audio:</b> <button onclick="forceDownload('${data.audio_url}', 'tiktok-audio.mp3')">Download Audio</button></p>
+                    <p><b>Thumbnail:</b> <br><img src="${data.thumbnail}" alt="Thumbnail"></p>
+                    <p><b>Script:</b> ${data.script}</p>
                 `;
+
             } catch (error) {
                 document.getElementById("result").innerHTML = "<p>Error fetching video.</p>";
+            }
+        }
+
+        async function forceDownload(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                alert("Download failed: " + error.message);
             }
         }
     </script>
